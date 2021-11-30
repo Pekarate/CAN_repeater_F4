@@ -73,6 +73,7 @@ uint16_t Debug_len =0;
 
 volatile uint8_t Can1_tx_done =1;
 volatile uint8_t Can2_tx_done =1;
+uint32_t time_delay =1000;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -232,6 +233,7 @@ void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef *hcan)
 	}
 
 }
+
 /* USER CODE END 0 */
 
 /**
@@ -329,50 +331,77 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	uint32_t DebugTime =0;
+	uint32_t Can2_tim  =0;
+
   while (1)
   {
-	  if(rc1)
-	  {
-		  CanTxHeader.StdId = Can1RxHeader[ro1].StdId;
-		  CanTxHeader.RTR = Can1RxHeader[ro1].RTR;
-		  CanTxHeader.IDE = Can1RxHeader[ro1].IDE;
-		  CanTxHeader.DLC = Can1RxHeader[ro1].DLC;
-		  CanTxHeader.TransmitGlobalTime = DISABLE;
-		  memcpy(CanTxData,Can1RxData[ro1],8);
-		  if(HAL_CAN_AddTxMessage(&hcan2, &CanTxHeader, CanTxData, &Tx1Mailbox) != HAL_OK)
-		  {
-			/* Transmission request Error */
-			//Error_Handler();
-		  }
-		  else
-		  {
-			  Can2_tx_done =0;
-			  if(ro1 == (CAN_RX_SIZE -1)) { ro1 =0;}
-			  else ro1++;
-			  rc1--;
-		  }
-	  }
-	  if(rc2)
-	  {
-		  CanTxHeader.StdId = Can2RxHeader[ro2].StdId;
-		  CanTxHeader.RTR = Can2RxHeader[ro2].RTR;
-		  CanTxHeader.IDE = Can2RxHeader[ro2].IDE;
-		  CanTxHeader.DLC = Can2RxHeader[ro2].DLC;
-		  CanTxHeader.TransmitGlobalTime = DISABLE;
-		  memcpy(CanTxData,Can2RxData[ro2],8);
-		  if(HAL_CAN_AddTxMessage(&hcan1, &CanTxHeader, CanTxData, &Tx2Mailbox) != HAL_OK)
-		  {
-			/* Transmission request Error */
-			//Error_Handler();
-		  }
-		  else
-		  {
-			  Can1_tx_done =0;
-			  if(ro2 == (CAN_RX_SIZE -1)) { ro2 =0;}
-			  else ro2++;
-			  rc2--;
-		  }
-	  }
+	  	  if(HAL_GetTick() > Can2_tim)
+	  	  {
+	  		  CanTxHeader.StdId = 10;
+	  		  CanTxHeader.RTR = CAN_RTR_DATA;
+	  		  CanTxHeader.IDE = CAN_ID_STD;
+	  		  CanTxHeader.DLC = 8;
+	  		  CanTxHeader.TransmitGlobalTime = DISABLE;
+	  		  for(int i=0;i<8;i++)
+	  		  {
+	  			  CanTxData[i]++;
+	  		  }
+	  		  if(HAL_CAN_AddTxMessage(&hcan2, &CanTxHeader, CanTxData, &Tx1Mailbox) != HAL_OK)
+	  		  {
+	  			/* Transmission request Error */
+	  			//Error_Handler();
+	  		  }
+	  		  else
+	  		  {
+	  			  Can2_tx_done =0;
+	  			  if(ro1 == (CAN_RX_SIZE -1)) { ro1 =0;}
+	  			  else ro1++;
+	  			  rc1--;
+	  		  }
+	  		  Can2_tim = HAL_GetTick()+ time_delay;
+	  	  }
+//	  if(rc1)
+//	  {
+//		  CanTxHeader.StdId = Can1RxHeader[ro1].StdId;
+//		  CanTxHeader.RTR = Can1RxHeader[ro1].RTR;
+//		  CanTxHeader.IDE = Can1RxHeader[ro1].IDE;
+//		  CanTxHeader.DLC = Can1RxHeader[ro1].DLC;
+//		  CanTxHeader.TransmitGlobalTime = DISABLE;
+//		  memcpy(CanTxData,Can1RxData[ro1],8);
+//		  if(HAL_CAN_AddTxMessage(&hcan2, &CanTxHeader, CanTxData, &Tx1Mailbox) != HAL_OK)
+//		  {
+//			/* Transmission request Error */
+//			//Error_Handler();
+//		  }
+//		  else
+//		  {
+//			  Can2_tx_done =0;
+//			  if(ro1 == (CAN_RX_SIZE -1)) { ro1 =0;}
+//			  else ro1++;
+//			  rc1--;
+//		  }
+//	  }
+//	  if(rc2)
+//	  {
+//		  CanTxHeader.StdId = Can2RxHeader[ro2].StdId;
+//		  CanTxHeader.RTR = Can2RxHeader[ro2].RTR;
+//		  CanTxHeader.IDE = Can2RxHeader[ro2].IDE;
+//		  CanTxHeader.DLC = Can2RxHeader[ro2].DLC;
+//		  CanTxHeader.TransmitGlobalTime = DISABLE;
+//		  memcpy(CanTxData,Can2RxData[ro2],8);
+//		  if(HAL_CAN_AddTxMessage(&hcan1, &CanTxHeader, CanTxData, &Tx2Mailbox) != HAL_OK)
+//		  {
+//			/* Transmission request Error */
+//			//Error_Handler();
+//		  }
+//		  else
+//		  {
+//			  Can1_tx_done =0;
+//			  if(ro2 == (CAN_RX_SIZE -1)) { ro2 =0;}
+//			  else ro2++;
+//			  rc2--;
+//		  }
+//	  }
 	  if(HAL_GetTick() > DebugTime)
 	  {
 		  DebugTime = HAL_GetTick() +500;
