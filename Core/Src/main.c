@@ -85,7 +85,7 @@ static void MX_SPI1_Init(void);
 static void MX_WWDG_Init(void);
 static void MX_IWDG_Init(void);
 /* USER CODE BEGIN PFP */
-
+char Buf_infor[100];
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -97,6 +97,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
   /* Get RX message */
 	if(hcan->Instance == hcan1.Instance)
 	{
+		  memset(Buf_infor,0,100);
 		  if (HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &Can1RxHeader[ri1], Can1RxData[ri1]) != HAL_OK)
 		  {
 			/* Reception Error */
@@ -121,8 +122,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 							{
 								switch (index) {
 									case DOORRELAYTIME_CL:
-										  Debug_len =  sprintf(DebugBuf,"<= %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",StrFunctionCode[(functioncode>>4)],HAL_GetTick(),(Can1RxHeader[ri1].StdId &0x7F),((Can1RxHeader[ri1].StdId>>3) & 0xF0),Can1RxData[ri1][0],Can1RxData[ri1][1],Can1RxData[ri1][2],Can1RxData[ri1][3],Can1RxData[ri1][4],Can1RxData[ri1][5],Can1RxData[ri1][6],Can1RxData[ri1][7]);
-										  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
+//										  Debug_len =  sprintf(DebugBuf,"<= %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",StrFunctionCode[(functioncode>>4)],HAL_GetTick(),(Can1RxHeader[ri1].StdId &0x7F),((Can1RxHeader[ri1].StdId>>3) & 0xF0),Can1RxData[ri1][0],Can1RxData[ri1][1],Can1RxData[ri1][2],Can1RxData[ri1][3],Can1RxData[ri1][4],Can1RxData[ri1][5],Can1RxData[ri1][6],Can1RxData[ri1][7]);
+//										  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
 										break;
 									default:
 										break;
@@ -136,8 +137,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 							switch (index)
 							{
 								case LOAD_VALUE:
-									  Debug_len =  sprintf(DebugBuf,"<= %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",StrFunctionCode[(functioncode>>4)],HAL_GetTick(),(Can1RxHeader[ri1].StdId &0x7F),((Can1RxHeader[ri1].StdId>>3) & 0xF0),Can1RxData[ri1][0],Can1RxData[ri1][1],Can1RxData[ri1][2],Can1RxData[ri1][3],Can1RxData[ri1][4],Can1RxData[ri1][5],Can1RxData[ri1][6],Can1RxData[ri1][7]);
-									  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
+//									  Debug_len =  sprintf(DebugBuf,"<= %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",StrFunctionCode[(functioncode>>4)],HAL_GetTick(),(Can1RxHeader[ri1].StdId &0x7F),((Can1RxHeader[ri1].StdId>>3) & 0xF0),Can1RxData[ri1][0],Can1RxData[ri1][1],Can1RxData[ri1][2],Can1RxData[ri1][3],Can1RxData[ri1][4],Can1RxData[ri1][5],Can1RxData[ri1][6],Can1RxData[ri1][7]);
+//									  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
 									break;
 								default:
 									break;
@@ -148,13 +149,14 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 					}
 					break;
 					 case DOORS:
-									  Debug_len =  sprintf(DebugBuf,"<= %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",StrFunctionCode[(functioncode>>4)],HAL_GetTick(),(Can1RxHeader[ri1].StdId &0x7F),((Can1RxHeader[ri1].StdId>>3) & 0xF0),Can1RxData[ri1][0],Can1RxData[ri1][1],Can1RxData[ri1][2],Can1RxData[ri1][3],Can1RxData[ri1][4],Can1RxData[ri1][5],Can1RxData[ri1][6],Can1RxData[ri1][7]);
-									  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
+//									  Debug_len =  sprintf(DebugBuf,"<= %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",StrFunctionCode[(functioncode>>4)],HAL_GetTick(),(Can1RxHeader[ri1].StdId &0x7F),((Can1RxHeader[ri1].StdId>>3) & 0xF0),Can1RxData[ri1][0],Can1RxData[ri1][1],Can1RxData[ri1][2],Can1RxData[ri1][3],Can1RxData[ri1][4],Can1RxData[ri1][5],Can1RxData[ri1][6],Can1RxData[ri1][7]);
+//									  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
 					  break;
 				default:
 					break;
 			  }
-
+			  Debug_len =  sprintf(DebugBuf,"%lu<= %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",HAL_GetTick(),StrFunctionCode[(functioncode>>4)],HAL_GetTick(),(Can1RxHeader[ri1].StdId &0x7F),((Can1RxHeader[ri1].StdId>>3) & 0xF0),Can1RxData[ri1][0],Can1RxData[ri1][1],Can1RxData[ri1][2],Can1RxData[ri1][3],Can1RxData[ri1][4],Can1RxData[ri1][5],Can1RxData[ri1][6],Can1RxData[ri1][7]);
+			  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
 			  RxCan1_cnt ++;
 			  rc1++;
 			  if(ri1 == (CAN_RX_SIZE -1)) { ri1 =0;}
@@ -333,46 +335,47 @@ int main(void)
   {
 	  if(rc1)
 	  {
-		  CanTxHeader.StdId = Can1RxHeader[ro1].StdId;
-		  CanTxHeader.RTR = Can1RxHeader[ro1].RTR;
-		  CanTxHeader.IDE = Can1RxHeader[ro1].IDE;
-		  CanTxHeader.DLC = Can1RxHeader[ro1].DLC;
-		  CanTxHeader.TransmitGlobalTime = DISABLE;
-		  memcpy(CanTxData,Can1RxData[ro1],8);
-		  if(HAL_CAN_AddTxMessage(&hcan2, &CanTxHeader, CanTxData, &Tx1Mailbox) != HAL_OK)
-		  {
-			/* Transmission request Error */
-			//Error_Handler();
-		  }
-		  else
-		  {
-			  Can2_tx_done =0;
-			  if(ro1 == (CAN_RX_SIZE -1)) { ro1 =0;}
-			  else ro1++;
-			  rc1--;
-		  }
+
+//		  CanTxHeader.StdId = Can1RxHeader[ro1].StdId;
+//		  CanTxHeader.RTR = Can1RxHeader[ro1].RTR;
+//		  CanTxHeader.IDE = Can1RxHeader[ro1].IDE;
+//		  CanTxHeader.DLC = Can1RxHeader[ro1].DLC;
+//		  CanTxHeader.TransmitGlobalTime = DISABLE;
+//		  memcpy(CanTxData,Can1RxData[ro1],8);
+//		  if(HAL_CAN_AddTxMessage(&hcan2, &CanTxHeader, CanTxData, &Tx1Mailbox) != HAL_OK)
+//		  {
+//			/* Transmission request Error */
+//			//Error_Handler();
+//		  }
+//		  else
+//		  {
+//			  Can2_tx_done =0;
+//			  if(ro1 == (CAN_RX_SIZE -1)) { ro1 =0;}
+//			  else ro1++;
+//			  rc1--;
+//		  }
 	  }
-	  if(rc2)
-	  {
-		  CanTxHeader.StdId = Can2RxHeader[ro2].StdId;
-		  CanTxHeader.RTR = Can2RxHeader[ro2].RTR;
-		  CanTxHeader.IDE = Can2RxHeader[ro2].IDE;
-		  CanTxHeader.DLC = Can2RxHeader[ro2].DLC;
-		  CanTxHeader.TransmitGlobalTime = DISABLE;
-		  memcpy(CanTxData,Can2RxData[ro2],8);
-		  if(HAL_CAN_AddTxMessage(&hcan1, &CanTxHeader, CanTxData, &Tx2Mailbox) != HAL_OK)
-		  {
-			/* Transmission request Error */
-			//Error_Handler();
-		  }
-		  else
-		  {
-			  Can1_tx_done =0;
-			  if(ro2 == (CAN_RX_SIZE -1)) { ro2 =0;}
-			  else ro2++;
-			  rc2--;
-		  }
-	  }
+//	  if(rc2)
+//	  {
+//		  CanTxHeader.StdId = Can2RxHeader[ro2].StdId;
+//		  CanTxHeader.RTR = Can2RxHeader[ro2].RTR;
+//		  CanTxHeader.IDE = Can2RxHeader[ro2].IDE;
+//		  CanTxHeader.DLC = Can2RxHeader[ro2].DLC;
+//		  CanTxHeader.TransmitGlobalTime = DISABLE;
+//		  memcpy(CanTxData,Can2RxData[ro2],8);
+//		  if(HAL_CAN_AddTxMessage(&hcan1, &CanTxHeader, CanTxData, &Tx2Mailbox) != HAL_OK)
+//		  {
+//			/* Transmission request Error */
+//			//Error_Handler();
+//		  }
+//		  else
+//		  {
+//			  Can1_tx_done =0;
+//			  if(ro2 == (CAN_RX_SIZE -1)) { ro2 =0;}
+//			  else ro2++;
+//			  rc2--;
+//		  }
+//	  }
 	  if(HAL_GetTick() > DebugTime)
 	  {
 		  DebugTime = HAL_GetTick() +500;
@@ -795,4 +798,3 @@ void assert_failed(uint8_t *file, uint32_t line)
 }
 #endif /* USE_FULL_ASSERT */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
