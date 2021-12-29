@@ -19,13 +19,12 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "string.h"
 #include "canopen.h"
-#include "usbd_cdc_if.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -121,8 +120,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 							{
 								switch (index) {
 									case DOORRELAYTIME_CL:
-										  Debug_len =  sprintf(DebugBuf,"<= %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",StrFunctionCode[(functioncode>>4)],HAL_GetTick(),(Can1RxHeader[ri1].StdId &0x7F),((Can1RxHeader[ri1].StdId>>3) & 0xF0),Can1RxData[ri1][0],Can1RxData[ri1][1],Can1RxData[ri1][2],Can1RxData[ri1][3],Can1RxData[ri1][4],Can1RxData[ri1][5],Can1RxData[ri1][6],Can1RxData[ri1][7]);
-										  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
+//										  Debug_len =  sprintf(DebugBuf,"<= %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",StrFunctionCode[(functioncode>>4)],HAL_GetTick(),(Can1RxHeader[ri1].StdId &0x7F),((Can1RxHeader[ri1].StdId>>3) & 0xF0),Can1RxData[ri1][0],Can1RxData[ri1][1],Can1RxData[ri1][2],Can1RxData[ri1][3],Can1RxData[ri1][4],Can1RxData[ri1][5],Can1RxData[ri1][6],Can1RxData[ri1][7]);
+//										  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
 										break;
 									default:
 										break;
@@ -136,8 +135,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 							switch (index)
 							{
 								case LOAD_VALUE:
-									  Debug_len =  sprintf(DebugBuf,"<= %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",StrFunctionCode[(functioncode>>4)],HAL_GetTick(),(Can1RxHeader[ri1].StdId &0x7F),((Can1RxHeader[ri1].StdId>>3) & 0xF0),Can1RxData[ri1][0],Can1RxData[ri1][1],Can1RxData[ri1][2],Can1RxData[ri1][3],Can1RxData[ri1][4],Can1RxData[ri1][5],Can1RxData[ri1][6],Can1RxData[ri1][7]);
-									  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
+//									  Debug_len =  sprintf(DebugBuf,"<= %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",StrFunctionCode[(functioncode>>4)],HAL_GetTick(),(Can1RxHeader[ri1].StdId &0x7F),((Can1RxHeader[ri1].StdId>>3) & 0xF0),Can1RxData[ri1][0],Can1RxData[ri1][1],Can1RxData[ri1][2],Can1RxData[ri1][3],Can1RxData[ri1][4],Can1RxData[ri1][5],Can1RxData[ri1][6],Can1RxData[ri1][7]);
+//									  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
 									break;
 								default:
 									break;
@@ -148,8 +147,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 					}
 					break;
 					 case DOORS:
-									  Debug_len =  sprintf(DebugBuf,"<= %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",StrFunctionCode[(functioncode>>4)],HAL_GetTick(),(Can1RxHeader[ri1].StdId &0x7F),((Can1RxHeader[ri1].StdId>>3) & 0xF0),Can1RxData[ri1][0],Can1RxData[ri1][1],Can1RxData[ri1][2],Can1RxData[ri1][3],Can1RxData[ri1][4],Can1RxData[ri1][5],Can1RxData[ri1][6],Can1RxData[ri1][7]);
-									  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
+//									  Debug_len =  sprintf(DebugBuf,"<= %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",StrFunctionCode[(functioncode>>4)],HAL_GetTick(),(Can1RxHeader[ri1].StdId &0x7F),((Can1RxHeader[ri1].StdId>>3) & 0xF0),Can1RxData[ri1][0],Can1RxData[ri1][1],Can1RxData[ri1][2],Can1RxData[ri1][3],Can1RxData[ri1][4],Can1RxData[ri1][5],Can1RxData[ri1][6],Can1RxData[ri1][7]);
+//									  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
 					  break;
 				default:
 					break;
@@ -171,8 +170,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 		  }
 		  else
 		  {
-			  Debug_len =  sprintf(DebugBuf,"=> %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",StrFunctionCode[(Can2RxHeader[ri2].StdId>>7)&0x0F],HAL_GetTick(),(Can2RxHeader[ri2].StdId &0x7F),((Can2RxHeader[ri2].StdId>>3) & 0xF0),Can2RxData[ri2][0],Can2RxData[ri2][1],Can2RxData[ri2][2],Can2RxData[ri2][3],Can2RxData[ri2][4],Can2RxData[ri2][5],Can2RxData[ri2][6],Can2RxData[ri2][7]);
-			  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
+//			  Debug_len =  sprintf(DebugBuf,"=> %s (%06lu)  0x%02lX 0x%02lX: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X \r\n",StrFunctionCode[(Can2RxHeader[ri2].StdId>>7)&0x0F],HAL_GetTick(),(Can2RxHeader[ri2].StdId &0x7F),((Can2RxHeader[ri2].StdId>>3) & 0xF0),Can2RxData[ri2][0],Can2RxData[ri2][1],Can2RxData[ri2][2],Can2RxData[ri2][3],Can2RxData[ri2][4],Can2RxData[ri2][5],Can2RxData[ri2][6],Can2RxData[ri2][7]);
+//			  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
 			  HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
 			  RxCan2_cnt ++;
 			  rc2++;
@@ -266,7 +265,6 @@ int main(void)
   MX_CAN2_Init();
   MX_I2C1_Init();
   MX_SPI1_Init();
-  MX_USB_DEVICE_Init();
 //  MX_WWDG_Init();
 //  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
@@ -297,7 +295,7 @@ int main(void)
 	if (HAL_CAN_Start(&hcan1) != HAL_OK)
 	{
 	  /* Start Error */
-	  Error_Handler();
+		Error_Handler();
 	}
 	if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
 	{
@@ -376,6 +374,7 @@ int main(void)
 	  if(HAL_GetTick() > DebugTime)
 	  {
 		  DebugTime = HAL_GetTick() +500;
+		  HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
 //		  Debug_len =  sprintf(DebugBuf,"(%lu) %lu %lu %lu %lu\n",HAL_GetTick(),RxCan1_cnt,TxCan2_cnt,RxCan2_cnt,TxCan1_cnt);
 //		  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
 //		  HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
@@ -674,8 +673,8 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(OTG_FS_PowerSwitchOn_GPIO_Port, OTG_FS_PowerSwitchOn_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, LD4_Pin|LD3_Pin|LD5_Pin|LD6_Pin
-                          |Audio_RST_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, LED_RUN_Pin|LD4_Pin|LD3_Pin|LD5_Pin
+                          |LD6_Pin|Audio_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : CS_I2C_SPI_Pin */
   GPIO_InitStruct.Pin = CS_I2C_SPI_Pin;
@@ -727,10 +726,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
   HAL_GPIO_Init(CLK_IN_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LD4_Pin LD3_Pin LD5_Pin LD6_Pin
-                           Audio_RST_Pin */
-  GPIO_InitStruct.Pin = LD4_Pin|LD3_Pin|LD5_Pin|LD6_Pin
-                          |Audio_RST_Pin;
+  /*Configure GPIO pins : LED_RUN_Pin LD4_Pin LD3_Pin LD5_Pin
+                           LD6_Pin Audio_RST_Pin */
+  GPIO_InitStruct.Pin = LED_RUN_Pin|LD4_Pin|LD3_Pin|LD5_Pin
+                          |LD6_Pin|Audio_RST_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -795,4 +794,3 @@ void assert_failed(uint8_t *file, uint32_t line)
 }
 #endif /* USE_FULL_ASSERT */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
