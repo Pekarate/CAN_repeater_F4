@@ -84,7 +84,37 @@ static void MX_SPI1_Init(void);
 static void MX_WWDG_Init(void);
 static void MX_IWDG_Init(void);
 /* USER CODE BEGIN PFP */
+static void MX_CAN1_slientMode_Init(void)
+{
 
+  /* USER CODE BEGIN CAN1_Init 0 */
+
+  /* USER CODE END CAN1_Init 0 */
+
+  /* USER CODE BEGIN CAN1_Init 1 */
+
+  /* USER CODE END CAN1_Init 1 */
+  hcan1.Instance = CAN1;
+  hcan1.Init.Prescaler = 18;
+  hcan1.Init.Mode = CAN_MODE_SILENT;
+  hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
+  hcan1.Init.TimeSeg1 = CAN_BS1_13TQ;
+  hcan1.Init.TimeSeg2 = CAN_BS2_2TQ;
+  hcan1.Init.TimeTriggeredMode = DISABLE;
+  hcan1.Init.AutoBusOff = DISABLE;
+  hcan1.Init.AutoWakeUp = DISABLE;
+  hcan1.Init.AutoRetransmission = ENABLE;
+  hcan1.Init.ReceiveFifoLocked = DISABLE;
+  hcan1.Init.TransmitFifoPriority = DISABLE;
+  if (HAL_CAN_Init(&hcan1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN CAN1_Init 2 */
+
+  /* USER CODE END CAN1_Init 2 */
+
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -103,6 +133,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 		  }
 		  else
 		  {
+#if 0
 			  uint8_t functioncode = ((Can1RxHeader[ri1].StdId>>3) & 0xF0);
 			  uint8_t type = Can1RxData[ri1][0];
 				uint16_t index;// = *(WORD *)&rx[ro][3];		/* read object index					*/
@@ -153,7 +184,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 				default:
 					break;
 			  }
-
+#endif
 			  RxCan1_cnt ++;
 			  rc1++;
 			  if(ri1 == (CAN_RX_SIZE -1)) { ri1 =0;}
@@ -194,6 +225,7 @@ void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
 	}
 	else if(hcan->Instance == hcan2.Instance)
 	{
+		HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
 		Can2_tx_done = 1;
 		TxCan2_cnt++;
 		CNT_interrup[1]++;
@@ -210,6 +242,7 @@ void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef *hcan)
 	}
 	else if(hcan->Instance == hcan2.Instance)
 	{
+		HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
 		Can2_tx_done = 1;
 		TxCan2_cnt++;
 		CNT_interrup[3]++;
@@ -225,12 +258,14 @@ void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef *hcan)
 	}
 	else if(hcan->Instance == hcan2.Instance)
 	{
+		HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
 		Can2_tx_done = 1;
 		TxCan2_cnt++;
 		CNT_interrup[5]++;
 	}
 
 }
+int CAN1Mode =0;
 /* USER CODE END 0 */
 
 /**
@@ -256,7 +291,6 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -265,9 +299,16 @@ int main(void)
   MX_CAN2_Init();
   MX_I2C1_Init();
   MX_SPI1_Init();
-//  MX_WWDG_Init();
-//  MX_IWDG_Init();
+ // MX_WWDG_Init();
+  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
+
+  CAN1Mode = HAL_GPIO_ReadPin(SW1_GPIO_Port, SW1_Pin);
+  if(CAN1Mode == 0)
+  {
+	  HAL_CAN_DeInit(&hcan1);
+	  MX_CAN1_slientMode_Init();
+  }
 	CAN_FilterTypeDef  sFilterConfig;
 	sFilterConfig.FilterBank = 0;
 	sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
@@ -329,6 +370,8 @@ int main(void)
 	uint32_t DebugTime =0;
   while (1)
   {
+	  HAL_IWDG_Refresh(&hiwdg);
+
 	  if(rc1)
 	  {
 		  CanTxHeader.StdId = Can1RxHeader[ro1].StdId;
@@ -350,7 +393,7 @@ int main(void)
 			  rc1--;
 		  }
 	  }
-	  if(rc2)
+	  if(rc2 )
 	  {
 		  CanTxHeader.StdId = Can2RxHeader[ro2].StdId;
 		  CanTxHeader.RTR = Can2RxHeader[ro2].RTR;
@@ -371,27 +414,27 @@ int main(void)
 			  rc2--;
 		  }
 	  }
-	  if(HAL_GetTick() > DebugTime)
-	  {
-		  DebugTime = HAL_GetTick() +500;
-		  HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
-//		  Debug_len =  sprintf(DebugBuf,"(%lu) %lu %lu %lu %lu\n",HAL_GetTick(),RxCan1_cnt,TxCan2_cnt,RxCan2_cnt,TxCan1_cnt);
-//		  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
-//		  HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
-//		  CanTxHeader.StdId = 0x01;
-//		  CanTxHeader.RTR = CAN_RTR_DATA;
-//		  CanTxHeader.IDE = CAN_ID_STD;
-//		  CanTxHeader.DLC = 7;
-//		  CanTxHeader.TransmitGlobalTime = DISABLE;
-//		  if(HAL_CAN_AddTxMessage(&hcan1, &CanTxHeader, Can2RxData[ro1], &Tx1Mailbox) != HAL_OK)
-//		  {
-//			/* Transmission request Error */
-//			Error_Handler();
-//		  }
-//		  else
-//		  {
-//		  }
-	  }
+//	  if(HAL_GetTick() > DebugTime)
+//	  {
+//		  DebugTime = HAL_GetTick() +500;
+////		  HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
+////		  Debug_len =  sprintf(DebugBuf,"(%lu) %lu %lu %lu %lu\n",HAL_GetTick(),RxCan1_cnt,TxCan2_cnt,RxCan2_cnt,TxCan1_cnt);
+////		  CDC_Transmit_FS((uint8_t *)DebugBuf, Debug_len);
+////		  HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
+////		  CanTxHeader.StdId = 0x01;
+////		  CanTxHeader.RTR = CAN_RTR_DATA;
+////		  CanTxHeader.IDE = CAN_ID_STD;
+////		  CanTxHeader.DLC = 7;
+////		  CanTxHeader.TransmitGlobalTime = DISABLE;
+////		  if(HAL_CAN_AddTxMessage(&hcan1, &CanTxHeader, Can2RxData[ro1], &Tx1Mailbox) != HAL_OK)
+////		  {
+////			/* Transmission request Error */
+////			Error_Handler();
+////		  }
+////		  else
+////		  {
+////		  }
+//	  }
 //	  HAL_IWDG_Refresh(&hiwdg);
 //	  HAL_WWDG_Refresh(&hwwdg);706481665
     /* USER CODE END WHILE */
@@ -423,8 +466,8 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 4;
-  RCC_OscInitStruct.PLL.PLLN = 96;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV6;
+  RCC_OscInitStruct.PLL.PLLN = 72;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -436,10 +479,10 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
@@ -461,7 +504,7 @@ static void MX_CAN1_Init(void)
 
   /* USER CODE END CAN1_Init 1 */
   hcan1.Instance = CAN1;
-  hcan1.Init.Prescaler = 4;
+  hcan1.Init.Prescaler = 18;
   hcan1.Init.Mode = CAN_MODE_NORMAL;
   hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
   hcan1.Init.TimeSeg1 = CAN_BS1_13TQ;
@@ -498,7 +541,7 @@ static void MX_CAN2_Init(void)
 
   /* USER CODE END CAN2_Init 1 */
   hcan2.Instance = CAN2;
-  hcan2.Init.Prescaler = 4;
+  hcan2.Init.Prescaler = 18;
   hcan2.Init.Mode = CAN_MODE_NORMAL;
   hcan2.Init.SyncJumpWidth = CAN_SJW_1TQ;
   hcan2.Init.TimeSeg1 = CAN_BS1_13TQ;
@@ -569,7 +612,7 @@ static void MX_IWDG_Init(void)
 
   /* USER CODE END IWDG_Init 1 */
   hiwdg.Instance = IWDG;
-  hiwdg.Init.Prescaler = IWDG_PRESCALER_4;
+  hiwdg.Init.Prescaler = IWDG_PRESCALER_16;
   hiwdg.Init.Reload = 4095;
   if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
   {
@@ -635,7 +678,7 @@ static void MX_WWDG_Init(void)
 
   /* USER CODE END WWDG_Init 1 */
   hwwdg.Instance = WWDG;
-  hwwdg.Init.Prescaler = WWDG_PRESCALER_4;
+  hwwdg.Init.Prescaler = WWDG_PRESCALER_8;
   hwwdg.Init.Window = 64;
   hwwdg.Init.Counter = 64;
   hwwdg.Init.EWIMode = WWDG_EWI_DISABLE;
@@ -667,21 +710,17 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(CS_I2C_SPI_GPIO_Port, CS_I2C_SPI_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(OTG_FS_PowerSwitchOn_GPIO_Port, OTG_FS_PowerSwitchOn_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, LED_RUN_Pin|LD4_Pin|LD3_Pin|LD5_Pin
                           |LD6_Pin|Audio_RST_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : CS_I2C_SPI_Pin */
-  GPIO_InitStruct.Pin = CS_I2C_SPI_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  /*Configure GPIO pins : SW1_Pin SW2_Pin SW3_Pin SW4_Pin */
+  GPIO_InitStruct.Pin = SW1_Pin|SW2_Pin|SW3_Pin|SW4_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(CS_I2C_SPI_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /*Configure GPIO pin : OTG_FS_PowerSwitchOn_Pin */
   GPIO_InitStruct.Pin = OTG_FS_PowerSwitchOn_Pin;
@@ -690,41 +729,17 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(OTG_FS_PowerSwitchOn_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PDM_OUT_Pin */
-  GPIO_InitStruct.Pin = PDM_OUT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
-  HAL_GPIO_Init(PDM_OUT_GPIO_Port, &GPIO_InitStruct);
-
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_EVT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : I2S3_WS_Pin */
-  GPIO_InitStruct.Pin = I2S3_WS_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF6_SPI3;
-  HAL_GPIO_Init(I2S3_WS_GPIO_Port, &GPIO_InitStruct);
-
   /*Configure GPIO pin : BOOT1_Pin */
   GPIO_InitStruct.Pin = BOOT1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(BOOT1_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : CLK_IN_Pin */
-  GPIO_InitStruct.Pin = CLK_IN_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
-  HAL_GPIO_Init(CLK_IN_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LED_RUN_Pin LD4_Pin LD3_Pin LD5_Pin
                            LD6_Pin Audio_RST_Pin */
@@ -735,8 +750,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : I2S3_MCK_Pin I2S3_SCK_Pin I2S3_SD_Pin */
-  GPIO_InitStruct.Pin = I2S3_MCK_Pin|I2S3_SCK_Pin|I2S3_SD_Pin;
+  /*Configure GPIO pins : I2S3_SCK_Pin I2S3_SD_Pin */
+  GPIO_InitStruct.Pin = I2S3_SCK_Pin|I2S3_SD_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
